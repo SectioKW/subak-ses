@@ -1,0 +1,44 @@
+[tool.poetry]
+name = "subak-ses"
+version = "0.1.0"
+description = "Dynamic system model of Subak Bali as a social-ecological system"
+authors = ["SectioKW <sectiokrisna@gmail.com>"]
+readme = "README.md"
+license = "MIT"
+packages = [
+    { include = "subak_ses", from = "src" }
+]
+[tool.poetry.dependencies]
+python = ">=3.12"
+numpy = ">=2.3.2,<3.0.0"
+scipy = ">=1.16.1,<2.0.0"
+matplotlib = ">=3.10.5,<4.0.0"
+pandas = ">=2.3.2,<3.0.0"
+seaborn = "^0.13.2"
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
+ruff = "^0.12.10"
+isort = "^6.0.1"
+pytest = "^8.4.1"
+pre-commit = "^4.3.0"
+ipykernel = "^6.29.5"  # so you can use Jupyter with poetry env
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+
+[tool.isort]
+profile = "black"
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F", "B"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
