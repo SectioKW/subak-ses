@@ -1,35 +1,32 @@
+# subak_ses/models/system.py
 import numpy as np
-from typing import Sequence, Dict
-
+from typing import Tuple, Dict, Callable
 from .hydrology import hydrology
 from .agriculture import agriculture
 from .tourism import tourism
 from .governance import governance
+from .harvest import compute_harvest
 
 
-def rhs(t: float, y: Sequence[float], params: Dict) -> np.ndarray:
-    r"""
-    Full Subak SES system wrapper.
-
-    State variables:
-        .. math::
-
-            y = [W, P, T, G]
+def rhs(
+    t: float,
+    y: np.ndarray,
+    params: Dict,
+    Rin_func: Callable[[float], float],
+    D_ext_func: Callable[[float], float],
+) -> np.ndarray:
     """
-    W, P, T, G = y
+    Full system RHS. y order: [W, P, T, G]
+    """
+    W, P, T, G = float(y[0]), float(y[1]), float(y[2]), float(y[3])
 
-    dWdt = hydrology(t, W, P, T, params)
-    dPdt = agriculture(W, P, params)
-    dTdt = tourism(T, G, params)
-    dGdt = governance(W, P, G, params)
+    dW = hydrology(t, W, P, T, params, Rin_func)
+    dP = agriculture(W, P, params)
+    dT = tourism(T, D_ext_func(t), G, params)
+    dG = governance(W, P, T, G, params)
 
-    return np.array([dWdt, dPdt, dTdt, dGdt], dtype=float)
+    return np.array([dW, dP, dT, dG], dtype=float)
 
 
-def compute_harvest(y: np.ndarray, params: dict) -> np.ndarray:
-    """Compute harvest H(t) based on rice population and parameters."""
-    rice = y[1]  # assuming index 1 = Rice
-    r_p = params.get("r_p", 0.1)
-    K_p = params.get("K_p", 100.0)
-    H = r_p * rice * (1 - rice / K_p)
-    return H
+# make compute_harvest available from this module too
+__all__ = ["rhs", "compute_harvest"]

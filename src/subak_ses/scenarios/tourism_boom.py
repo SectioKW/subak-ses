@@ -1,3 +1,8 @@
+# scenarios/tourism_boom.py
+"""
+Tourism boom: stronger external demand.
+"""
+
 from subak_ses.config import Parameters
 
-tourism_boom_params = Parameters(D_ext=80.0 * 2.0)  # 100% increase
+tourism_boom_params = Parameters(alpha_T=Parameters().alpha_T * 2)  # e.g. +50%

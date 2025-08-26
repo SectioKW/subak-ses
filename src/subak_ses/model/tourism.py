@@ -1,14 +1,15 @@
-from typing import Dict
+# subak_ses/models/tourism.py
+from typing import Dict, Callable
 
 
-def tourism(T: float, G: float, params: Dict) -> float:
-    r"""
-    Tourism demand dynamics.
-
-    Equation:
-        .. math::
-
-            \frac{dT}{dt} =
-                k_t \Big( D_{ext} - \beta_T G T - T \Big)
+def tourism(T: float, D_ext: float, G: float, params: Dict) -> float:
     """
-    return params["k_t"] * (params["D_ext"] - params["beta_T"] * G * T - T)
+    Tourism dynamics.
+
+    We use the formulation:
+        dT/dt = alpha_T * D_ext(t) - beta_T * G * T
+
+    - alpha_T scales how external demand translates into realized tourism growth.
+    - beta_T * G * T is governance-imposed damping proportional to current T.
+    """
+    return params["alpha_T"] * float(D_ext) - params["beta_T"] * G * T

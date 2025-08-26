@@ -6,13 +6,12 @@ from dataclasses import dataclass, asdict
 class InitialState:
     """Initial state variables [W, P, T, G]."""
 
-    water: float = 30.0  # Water storage (m^3)
-    rice: float = 30.0  # Rice population/area
-    tourism: float = 20.0  # Tourism demand
-    governance: float = 0.5  # Governance intensity (0..1)
+    water: float = 30.0  # Water storage
+    rice: float = 30.0  # Rice productivity proxy
+    tourism: float = 20.0  # Tourism scale
+    governance: float = 0.2  # Governance index (0–1)
 
     def as_array(self) -> np.ndarray:
-        """Return state as numpy array [W, P, T, G]."""
         return np.array(
             [self.water, self.rice, self.tourism, self.governance], dtype=float
         )
@@ -20,33 +19,41 @@ class InitialState:
 
 @dataclass(frozen=True)
 class Parameters:
-    """Model parameters for Subak SES dynamics."""
+    """Unified parameter set for Subak SES model."""
 
-    # Hydrology
-    lambda_W: float = 0.08  # Evaporation rate
-    K_w: float = 40.0  # Water saturation half-constant
-    rain_mean: float = 40.0  # Mean rainfall inflow
-    rain_amp: float = 15.0  # Seasonal amplitude
-    rain_period: float = 12.0  # Period of rainfall oscillation (months)
+    # --- Water (3.2.1) ---
+    lambda_w: float = 0.08  # Evaporation / leakage
+    q_p_coeff: float = 0.6  # Water demand coefficient (agriculture)
+    q_t_coeff: float = 0.5  # Water demand coefficient (tourism)
 
-    # Agriculture
-    alpha_p: float = 0.04  # Water demand coefficient (rice)
-    r_p: float = 0.12  # Rice growth rate
-    K_p: float = 80.0  # Carrying capacity (rice)
-    delta_p: float = 0.03  # Rice decay/mortality
+    # Seasonal rainfall forcing
+    rain_mean: float = 40.0  # Mean inflow
+    rain_amp: float = 15.0  # Amplitude
+    rain_period: float = 12.0  # Period (months)
 
-    # Tourism
-    alpha_t: float = 0.02  # Water demand coefficient (tourism)
-    k_t: float = 0.07  # Adjustment rate for tourism demand
-    D_ext: float = 60.0  # External tourism demand
-    beta_T: float = 0.6  # Governance effect on tourism demand
+    # --- Agriculture (3.2.2) ---
+    r_p: float = 0.12  # Growth rate
+    K_p: float = 80.0  # Carrying capacity
+    K_w: float = 40.0  # Half-saturation constant for water
+    delta_p: float = 0.03  # Loss rate
 
-    # Governance
-    rho: float = 0.08  # Governance adjustment rate
-    gamma1: float = 0.12  # Shock responsiveness
-    gamma2: float = 0.08  # Rice-target responsiveness
-    decay: float = 0.03  # Governance decay
-    P_target: float = 50.0  # Target rice population
+    # --- Tourism (3.2.3) ---
+    alpha_T: float = 0.05  # Sensitivity to external demand
+    beta_T: float = 0.6  # Governance restriction strength
+
+    # --- Governance (3.2.4) ---
+    rho: float = 0.2  # Adaptation rate
+    gamma1: float = 0.12  # Weight of W
+    gamma2: float = 0.2  # Weight of P
+    gamma3: float = 0.10  # Weight of T
+    W_ref: float = 40.0  # Reference water
+    T_ref: float = 50.0  # Reference tourism
+
+    s_crisis: float = 0.2  # Shock magnitude
+    W_threshold: float = 15.0  # Crisis threshold
+
+    # --- Output (3.2.5) ---
+    n: float = 1.0  # Harvest conversion coefficient
 
     def as_dict(self) -> dict:
         return asdict(self)

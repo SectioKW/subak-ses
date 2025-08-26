@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from subak_ses.simulator import run_simulation
 from subak_ses.config import default_state
-from .analysis import summary_stats
+from subak_ses.utils.analysis import summary_stats  # fixed import
 
 sns.set_theme(style="whitegrid", context="talk")
 
@@ -63,13 +63,10 @@ def report_scenarios(results: dict):
     for name, df in results.items():
         plot_single_scenario(name, df)
         print(f"\n{name} scenario analysis:")
-        print(
-            summary_stats(
-                {
-                    "t": df["t"].values,
-                    "y": df[
-                        ["Water", "Rice", "Tourism", "Governance", "Harvest"]
-                    ].values.T,
-                }
-            )
+        stats = summary_stats(
+            {
+                "t": df["t"].values,
+                "y": df[["Water", "Rice", "Tourism", "Governance", "Harvest"]].values.T,
+            }
         )
+        print(stats)
